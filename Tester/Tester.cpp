@@ -56,11 +56,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
+	MessageBox(0, "", "L", MB_OK);
 	ShutdownCef();
     return (int) msg.wParam;
 }
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -124,10 +123,23 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return
 //
 //
+HWND brauser = nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_CREATE:
+	{
+		brauser = CreateBrowserWindow(hWnd);
+	}
+	break;
+	case WM_SIZE:
+	{
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		SetWindowPos(brauser, nullptr, 60, 60, rect.right - 120, rect.bottom - 120, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	}
+	break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -143,14 +155,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
         }
         break;
     case WM_DESTROY:

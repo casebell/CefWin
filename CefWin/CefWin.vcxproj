@@ -195,10 +195,14 @@
   <ItemGroup>
     <ClCompile Include="App.h" />
     <ClCompile Include="Cef.cpp" />
+    <ClCompile Include="CefHandler.cpp" />
     <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CefHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,3 +2,4 @@ LIBRARY
 EXPORTS
 	InitializeCef
 	ShutdownCef
+	CreateBrowserWindow
