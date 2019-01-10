@@ -3,10 +3,11 @@
 
 CefHandler::CefHandler() { }
 
-CefHandler::~CefHandler() { }
+CefHandler::~CefHandler() {
+}
 
 CefRefPtr<CefBrowser> CefHandler::GetBrowser() {
-	return browser;
+	return cefBrowser;
 }
 
 CefRefPtr<CefContextMenuHandler> CefHandler::GetContextMenuHandler() {
@@ -52,7 +53,7 @@ void CefHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 	//	AutoLock lock_scope(this);
 
-	this->browser = browser;
+	this->cefBrowser = browser;
 	CefLifeSpanHandler::OnAfterCreated(browser);
 }
 

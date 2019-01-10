@@ -56,7 +56,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-	MessageBox(0, "", "L", MB_OK);
 	ShutdownCef();
     return (int) msg.wParam;
 }

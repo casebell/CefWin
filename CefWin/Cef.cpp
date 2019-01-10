@@ -7,13 +7,8 @@
 #include "CefHandler.h"
 using namespace std;
 
-struct Affen
-{
-	CefRefPtr<App> app{ new App };
-	CefRefPtr<CefHandler> cef_handler;
-};
-
-Affen* affen = new Affen;
+CefRefPtr<App> app;
+CefRefPtr<CefHandler> cef_handler;
 void* sandbox_info{ nullptr };
 HINSTANCE instance{ nullptr };
 const wstring BROWSER_WINDOW_CLASS(L"CefWin");
@@ -26,8 +21,7 @@ LRESULT CALLBACK BrowserWindowWndProc(HWND hWnd, UINT message, WPARAM wparam, LP
 	{
 		case WM_CREATE:
 		{
-			affen->cef_handler = new CefHandler();
-
+			cef_handler = new CefHandler; 
 			RECT rect = { 0 };
 			GetClientRect(hWnd, &rect);
 
@@ -35,7 +29,7 @@ LRESULT CALLBACK BrowserWindowWndProc(HWND hWnd, UINT message, WPARAM wparam, LP
 			info.SetAsChild(hWnd, rect);
 
 			CefBrowserSettings settings;
-			CefBrowserHost::CreateBrowser(info, affen->cef_handler.get(), CefString("http://www.google.com"), settings, nullptr);
+			CefBrowserHost::CreateBrowser(info, cef_handler.get(), CefString("http://www.google.com"), settings, nullptr);
 			//CefBrowserHost::CreateBrowser(info, example_cef_handler.get(), CefString("client://tests/handler.html"), settings, NULL);
 		}
 		break;
@@ -44,9 +38,9 @@ LRESULT CALLBACK BrowserWindowWndProc(HWND hWnd, UINT message, WPARAM wparam, LP
 		{
 			// from the cefclient example, do not allow the window to be resized to 0x0 or the layout will break;
 			// also be aware that if the size gets too small, GPU acceleration disables
-			if ((wparam != SIZE_MINIMIZED) && (affen->cef_handler.get()) && (affen->cef_handler->GetBrowser()))
+			if ((wparam != SIZE_MINIMIZED) && (cef_handler.get()) && (cef_handler->GetBrowser()))
 			{
-				CefWindowHandle cefWindow(affen->cef_handler->GetBrowser()->GetHost()->GetWindowHandle());
+				CefWindowHandle cefWindow(cef_handler->GetBrowser()->GetHost()->GetWindowHandle());
 				if (cefWindow)
 				{
 					RECT rect = { 0 };
@@ -61,9 +55,9 @@ LRESULT CALLBACK BrowserWindowWndProc(HWND hWnd, UINT message, WPARAM wparam, LP
 
 		case WM_ERASEBKGND:
 		{
-			if ((affen->cef_handler.get()) && (affen->cef_handler->GetBrowser()))
+			if ((cef_handler.get()) && (cef_handler->GetBrowser()))
 			{
-				CefWindowHandle cefWindow(affen->cef_handler->GetBrowser()->GetHost()->GetWindowHandle());
+				CefWindowHandle cefWindow(cef_handler->GetBrowser()->GetHost()->GetWindowHandle());
 				// from the cefclient example, don't erase the background 
 				// if the browser window has been loaded to avoid flashing
 				result = cefWindow ? 1 : DefWindowProc(hWnd, message, wparam, lparam);
@@ -86,6 +80,14 @@ LRESULT CALLBACK BrowserWindowWndProc(HWND hWnd, UINT message, WPARAM wparam, LP
 			result = DefWindowProc(hWnd, message, wparam, lparam);
 		}
 		break;
+
+		case WM_DESTROY:
+		{
+			cef_handler->GetBrowser()->GetHost()->CloseBrowser(false);
+			//cef_handler->OnBeforeClose(brauser);
+			cef_handler->DoClose(cef_handler->GetBrowser());
+			break;
+		}
 
 		default:
 		{
@@ -125,7 +127,7 @@ void InitializeCef(HINSTANCE hInstance)
 #endif
 
 	// CefExecuteProcess returns -1 for the host process
-	if (CefExecuteProcess(main_args, affen->app.get(), sandbox_info) == -1)
+	if (CefExecuteProcess(main_args, app.get(), sandbox_info) == -1)
 	{
 		array<char, MAX_PATH> buffer;
 		GetModuleFileNameA(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
@@ -140,7 +142,7 @@ void InitializeCef(HINSTANCE hInstance)
 #endif
 		CefString(&settings.browser_subprocess_path) = subprocess;
 		settings.multi_threaded_message_loop = true;
-		CefInitialize(main_args, settings, affen->app.get(), sandbox_info);
+		CefInitialize(main_args, settings, app.get(), sandbox_info);
 
 		RegisterBrowser();
 	}
@@ -148,8 +150,12 @@ void InitializeCef(HINSTANCE hInstance)
 
 void ShutdownCef()
 {
-	delete affen;
-//	CefShutdown();
+//	cef_handler->GetBrowser()->Release();
+	//cef_handler->Release();
+	//delete app;
+	//delete cef_handler;
+
+	CefShutdown();
 }
 
 HWND brause;

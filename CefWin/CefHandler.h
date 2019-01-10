@@ -16,6 +16,9 @@ public:
 	virtual ~CefHandler();
 	CefRefPtr<CefBrowser> GetBrowser();
 
+
+	void Affe() { this->DoClose(GetBrowser()); }
+
 #pragma region CefClient
 
 	// since we are letting the base implementations handle all of the heavy lifting,
@@ -49,7 +52,7 @@ public:
 
 protected:
 	// the browser reference
-	CefRefPtr<CefBrowser> browser;
+	CefRefPtr<CefBrowser> cefBrowser;
 
 	// Include the default reference counting implementation.
 	IMPLEMENT_REFCOUNTING(CefHandler);
